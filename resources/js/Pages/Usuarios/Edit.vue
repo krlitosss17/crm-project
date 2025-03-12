@@ -1,61 +1,69 @@
-<template>
-    <div>
-        <h1 class="text-xl font-bold mb-4">Editar Usuario</h1>
-
-        <!-- Formulario de edición de usuario -->
-        <form @submit.prevent="submit">
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
-                <input v-model="usuario.name" id="name" type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-            </div>
-
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input v-model="usuario.email" id="email" type="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-            </div>
-
-            <!-- Roles -->
-            <div class="mb-4">
-                <label for="roles" class="block text-sm font-medium text-gray-700">Roles</label>
-                <select v-model="usuario.roles" id="roles" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
-                </select>
-            </div>
-
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Guardar Cambios</button>
-        </form>
-    </div>
-</template>
-
+<!-- resources/js/Pages/Usuarios/Edit.vue -->
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { Inertia } from '@inertiajs/inertia';
+import { reactive } from "vue";
+import { useForm } from "@inertiajs/inertia-vue3";
+import Layout from "@/Layouts/AppLayout.vue";
+import { Inertia } from "@inertiajs/inertia";
 
-const route = useRoute();
-const router = useRouter();
-
-// Definir variables reactivas
-const usuario = ref({
-    name: '',
-    email: '',
-    roles: []
+// Recibir los datos del usuario desde el backend
+defineProps({
+    user: Object,
 });
 
-const roles = ref([]);
+// Crear formulario reactivo
+const form = useForm({
+    name: "",
+    email: "",
+    role: "ejecutivo",
+});
 
-// Cargar los datos del usuario y los roles
-onMounted(() => {
-    Inertia.get(route('usuarios.show', route.params.id), {}, {
-        onSuccess: (data) => {
-            usuario.value = data.props.usuario;
-            roles.value = data.props.roles;
-        }
+// Llenar el formulario con los datos del usuario
+form.name = user.name;
+form.email = user.email;
+form.role = user.role;
+
+// Función para actualizar el usuario
+const updateUser = () => {
+    Inertia.put(route("usuarios.update", user.id), form, {
+        onSuccess: () => {
+            alert("Usuario actualizado correctamente");
+        },
     });
-});
-
-// Enviar el formulario de actualización
-const submit = () => {
-    Inertia.put(route('usuarios.update', route.params.id), usuario.value);
 };
 </script>
+
+<template>
+    <Layout>
+        <div class="container mx-auto p-4">
+            <h2 class="text-2xl font-bold mb-4">Editar Usuario</h2>
+            <form @submit.prevent="updateUser" class="bg-white p-6 rounded-lg shadow-md">
+                <!-- Campo Nombre -->
+                <div class="mb-4">
+                    <label class="block text-gray-700">Nombre</label>
+                    <input v-model="form.name" type="text" class="w-full p-2 border rounded-lg" required />
+                </div>
+
+                <!-- Campo Correo -->
+                <div class="mb-4">
+                    <label class="block text-gray-700">Correo</label>
+                    <input v-model="form.email" type="email" class="w-full p-2 border rounded-lg" required />
+                </div>
+
+                <!-- Seleccionar Rol -->
+                <div class="mb-4">
+                    <label class="block text-gray-700">Rol</label>
+                    <select v-model="form.role" class="w-full p-2 border rounded-lg">
+                        <option value="admin">Administrador</option>
+                        <option value="ejecutivo">Ejecutivo</option>
+                        <option value="coordinador">Coordinador</option>
+                    </select>
+                </div>
+
+                <!-- Botón Guardar -->
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </Layout>
+</template>

@@ -31,6 +31,8 @@ Route::get('/dashboard', function () {
 Route::resource('usuarios', UsuarioController::class);
 
 
+
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/logout', [ProfileController::class, 'destroy'])->name('logout');

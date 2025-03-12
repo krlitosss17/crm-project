@@ -24,24 +24,40 @@ class UsuarioController extends Controller
 
     // Mostrar el formulario para editar un usuario
     public function edit($id)
-    {
-        $usuario = User::with('roles')->findOrFail($id);
-        $roles = Role::all(); // Trae todos los roles disponibles
-        return Inertia::render('Usuarios/Edit', [
-            'usuario' => $usuario,
-            'roles' => $roles
-        ]);
-    }
+{
+    // Obtener el usuario por su ID
+    $user = User::findOrFail($id);
+
+    // Pasar los datos del usuario a la vista de edición
+    return view('usuarios.edit', compact('user'));
+}
 
     // Actualizar el usuario
     public function update(Request $request, $id)
-    {
-        $usuario = User::findOrFail($id);
-        $usuario->update($request->only('name', 'email')); // Actualiza el nombre y el correo
+{
+    // Validación de datos
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'role' => 'required|in:admin,ejecutivo,coordinador',
+    ]);
 
-        // Actualizar los roles
-        $usuario->roles()->sync($request->roles); // Sincroniza los roles seleccionados
+    // Buscar el usuario y actualizarlo
+    $user = User::findOrFail($id);
+    $user->update([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+    ]);
 
-        return redirect()->route('usuarios.index');
-    }
+    // Asignar el rol
+    $user->syncRoles($validated['role']);
+
+    // Redirigir con éxito
+    return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado');
+}
+
+
+
+
+
 }

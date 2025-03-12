@@ -52,8 +52,8 @@ onMounted(() => {
 
             <!-- Sección derecha (Fecha, usuario y cerrar sesión) -->
             <div class="flex items-center space-x-4 text-gray-700 text-sm font-medium">
-                <span>{{ currentDate }}</span> <!-- Fecha actual -->
-                <span>Sesión iniciada por <strong class="uppercase">{{ $page.props.auth.user.name }}</strong></span> <!-- Usuario en negritas y mayúsculas -->
+                <span>{{ currentDate }},</span> <!-- Fecha actual -->
+                <span>Sesión iniciada por: &nbsp <strong class="uppercase">{{ $page.props.auth.user.name }}</strong></span> <!-- Usuario en negritas y mayúsculas -->
                 <!-- Botón de "Cerrar sesión" -->
                 <Link 
                     :href="route('logout')" 
